@@ -8,14 +8,14 @@ import torch.distributed as dist
 from yolox.exp import Exp as MyExp
 
 class Exp(MyExp):
-    def __init__(self):
+    def __init__(self, base_path="/media/a2mind/"):
         super(Exp, self).__init__()
         self.num_classes = 1
         self.depth = 1.33
         self.width = 1.25
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
-        self.train_ann = "train_ir.json" #"train_ccd.json"
-        self.val_ann = "val_ir.json" #"val_ccd.json"   
+        self.train_ann = "train_ccd.json" #"train_ccd.json"
+        self.val_ann = "val_ccd.json" #"val_ccd.json"   
         self.input_size = (896, 1600) #(800, 1440) 
         self.test_size = (896, 1600) #(800, 1440)
         #self.test_size = (736, 1920)
@@ -28,6 +28,7 @@ class Exp(MyExp):
         self.no_aug_epochs = 10
         self.basic_lr_per_img = 0.001 / 64.0
         self.warmup_epochs = 1
+        self.base_path= base_path
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False):
         from yolox.data import (
@@ -40,7 +41,7 @@ class Exp(MyExp):
         )
 
         dataset = MOTDataset(
-            data_dir="/media/a2mind/Backup/OC_SORT_datasets/camel_dataset",
+            data_dir=os.path.join(self.base_path, "camel_dataset"),
             json_file=self.train_ann,
             name='train',
             img_size=self.input_size,
@@ -95,7 +96,7 @@ class Exp(MyExp):
         from yolox.data import MOTDataset, ValTransform
 
         valdataset = MOTDataset(
-            data_dir="/media/a2mind/Backup/OC_SORT_datasets/camel_dataset",
+            data_dir=os.path.join(self.base_path, "camel_dataset"),
             json_file=self.val_ann,
             img_size=self.test_size,
             name='val', # change to train when running on training set
